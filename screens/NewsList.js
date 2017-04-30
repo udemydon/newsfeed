@@ -19,7 +19,8 @@ export default class NewsList extends Component {
     }
 
     render() {
-        const newsItems = [{title:"News Item1"}, {title: "News Item2"}];
+        //const newsItems = [{title:"News Item1"}, {title: "News Item2"}];
+        const newsItems = this.props.allPosts;
         return (
             <ListView
                 enableEmptySections

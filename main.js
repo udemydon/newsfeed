@@ -1,11 +1,14 @@
 import Expo from 'expo';
 import React from 'react';
+import { ApolloProvider } from 'react-apollo';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { NavigationProvider, StackNavigation } from '@expo/ex-navigation';
 import { FontAwesome } from '@expo/vector-icons';
 
 import Router from './navigation/Router';
 import cacheAssetsAsync from './utilities/cacheAssetsAsync';
+
+import client from 'newsfeed/apollo/client';
 
 class AppContainer extends React.Component {
   state = {
@@ -40,12 +43,14 @@ class AppContainer extends React.Component {
     if (this.state.appIsReady) {
       return (
         <View style={styles.container}>
-          <NavigationProvider router={Router}>
-            <StackNavigation
-              id="root"
-              initialRoute={Router.getRoute('rootNavigation')}
-            />
-          </NavigationProvider>
+          <ApolloProvider client={client}>
+              <NavigationProvider router={Router}>
+                <StackNavigation
+                  id="root"
+                  initialRoute={Router.getRoute('rootNavigation')}
+                />
+              </NavigationProvider>
+            </ApolloProvider>
 
           {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
           {Platform.OS === 'android' &&
