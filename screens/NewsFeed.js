@@ -5,6 +5,7 @@ import {
     Text
 } from 'react-native';
 import Colors from '../constants/Colors';
+import NewsList from './NewsList';
 
 
 export default class NewsFeed extends React.Component {
@@ -25,9 +26,7 @@ export default class NewsFeed extends React.Component {
 
     render() {
           return (
-            <View>
-              <Text>News Feed</Text>
-            </View>
+              <NewsList/>
           )
     }
 }
