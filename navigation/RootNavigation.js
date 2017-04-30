@@ -28,7 +28,7 @@ export default class RootNavigation extends React.Component {
         <TabNavigationItem
           id="home"
           renderIcon={isSelected => this._renderIcon('newspaper-o', isSelected)}>
-          <StackNavigation initialRoute="home" />
+          <StackNavigation initialRoute="newsFeed" />
         </TabNavigationItem>
 
         <TabNavigationItem
@@ -70,10 +70,10 @@ export default class RootNavigation extends React.Component {
   }
 
   _handleNotification = ({ origin, data }) => {
-    this.props.navigator.showLocalAlert(
+    /*this.props.navigator.showLocalAlert(
       `Push notification ${origin} with data: ${JSON.stringify(data)}`,
       Alerts.notice
-    );
+    );*/
   };
 }
 
