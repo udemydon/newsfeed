@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import {
     ListView,
     Text,
-    View
+    View,
+    RefreshControl
 } from 'react-native';
 import NewsListItem from './NewsListItem';
 
@@ -15,7 +16,8 @@ export default class NewsList extends Component {
 
     constructor(props){
         super(props);
-        this._renderItem = this._renderItem.bind(this)
+        this._renderItem = this._renderItem.bind(this);
+        this._onRefresh = this._onRefresh.bind(this);
     }
 
     render() {
@@ -27,6 +29,12 @@ export default class NewsList extends Component {
                 renderSeparator={this._renderSeparator}
                 dataSource={ds.cloneWithRows(newsItems)}
                 renderRow={this._renderItem}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={this.props.refreshing}
+                        onRefresh={this._onRefresh}
+                    />
+                }
             />
         );
     }
@@ -40,6 +48,10 @@ export default class NewsList extends Component {
             key={`${rowID}`}
             style={{height: 1, backgroundColor: '#CCCCCC'}}
         />
+    }
+
+    _onRefresh() {
+        this.props.onRefresh();
     }
 
 }

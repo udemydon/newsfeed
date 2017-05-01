@@ -28,7 +28,11 @@ class NewsDetail extends React.Component {
   }
 
    constructor(props){
-        super(props)
+        super(props);
+        this.state = {
+            refreshing: false
+        }
+        this._onRefresh = this._onRefresh.bind(this);
   }
 
   render(){
@@ -55,12 +59,32 @@ class NewsDetail extends React.Component {
         return (
             <ScrollView style={{flex: 1}}
                         scrollEnabled={true}
+                        refreshControl={<RefreshControl
+                        refreshing={this.state.refreshing}
+                        onRefresh={this._onRefresh}
+                    />}
                         >
               
                   <Text>{newsItem.content}</Text>
         
             </ScrollView>
         );
+    }
+
+    _onRefresh() {
+        var self = this;
+        this.setState({
+            refreshing: true
+        })
+        this.props.data.refetch().then((res)=> {
+            self.setState({
+                refreshing: false
+            })
+        }, (err) => {
+            self.setState({
+                refreshing: false
+            })
+        });
     }
 
     

@@ -19,8 +19,10 @@ class NewsFeed extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            allPosts: []
+            allPosts: [],
+            refreshing: false
         };
+        this._getNewsTitles = this._getNewsTitles.bind(this);
     }
 
     static route = {
@@ -64,7 +66,7 @@ class NewsFeed extends React.Component {
           const {allPosts} = this.state;
           console.log("posts:", allPosts);
           return (
-              <NewsList allPosts={allPosts} onGoToDetail={this._goToDetail.bind(this)}/>
+              <NewsList allPosts={allPosts} onGoToDetail={this._goToDetail.bind(this)} refreshing={this.state.refreshing} onRefresh={this._getNewsTitles} />
           )
     }
 
@@ -72,6 +74,23 @@ class NewsFeed extends React.Component {
         this.props.navigation
             .getNavigator('newsFeed')
             .push(Router.getRoute('newsDetail', { newsItem}));
+    }
+
+    _getNewsTitles(){
+        var self = this;
+        this.setState({
+            refreshing: true
+        })
+        this.props.data.refetch().then((res)=> {
+            self.setState({
+                allPosts: res.data.allPosts,
+                refreshing: false
+            })
+        }, (err) => {
+            self.setState({
+                refreshing: false
+            })
+        });
     }
 }
 
