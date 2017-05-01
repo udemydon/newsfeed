@@ -8,13 +8,16 @@ import {
   ScrollView,
   RefreshControl,
   ActivityIndicator,
-  TouchableOpacity
+  TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import Colors from 'newsfeed/constants/Colors';
 import Router from 'newsfeed/navigation/Router';
+
+const height = Dimensions.get('window').height;
 
 class NewsDetail extends React.Component {
   static route = {
@@ -58,7 +61,7 @@ class NewsDetail extends React.Component {
       console.log("News Item:", newsItem);
         return (
             <ScrollView style={{flex: 1}}
-                        scrollEnabled={false}
+                        scrollEnabled={true}
                         refreshControl={<RefreshControl
                         refreshing={this.state.refreshing}
                         onRefresh={this._onRefresh}
@@ -67,7 +70,7 @@ class NewsDetail extends React.Component {
               
                 <View style={styles.webViewContainer}>
                   <WebView
-                      source={{html: newsItem.contentHTML}} scrollEnabled={true} />
+                      source={{html: newsItem.contentHTML}}/>
                 </View>
         
             </ScrollView>
@@ -127,6 +130,7 @@ const styles = StyleSheet.create({
   },
   webViewContainer: {
     flex: 1,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    height
   },
 });
