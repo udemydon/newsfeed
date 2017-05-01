@@ -58,14 +58,17 @@ class NewsDetail extends React.Component {
       console.log("News Item:", newsItem);
         return (
             <ScrollView style={{flex: 1}}
-                        scrollEnabled={true}
+                        scrollEnabled={false}
                         refreshControl={<RefreshControl
                         refreshing={this.state.refreshing}
                         onRefresh={this._onRefresh}
                     />}
                         >
               
-                  <Text>{newsItem.content}</Text>
+                <View style={styles.webViewContainer}>
+                  <WebView
+                      source={{html: newsItem.contentHTML}} scrollEnabled={true} />
+                </View>
         
             </ScrollView>
         );
@@ -98,6 +101,7 @@ const NewsDetailQuery = gql`
       id
       title
       content
+      contentHTML
     }
   }
 `
@@ -120,5 +124,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-  }
+  },
+  webViewContainer: {
+    flex: 1,
+    backgroundColor: '#fff'
+  },
 });
