@@ -7,6 +7,7 @@ import {
     StyleSheet
 } from 'react-native';
 import NewsListItem from './NewsListItem';
+import Footer from './Footer';
 
 const ds = new ListView.DataSource({
     rowHasChanged: (r1, r2) => r1.id !== r2.id,
@@ -26,6 +27,8 @@ export default class NewsList extends Component {
     render() {
         //const newsItems = [{title:"News Item1"}, {title: "News Item2"}];
         const newsItems = this.props.allPosts;
+        const {allPostsLength, totalPosts} = this.props;
+        const showFooter = allPostsLength < totalPosts;
         return (
             <ListView
                 enableEmptySections
@@ -33,6 +36,14 @@ export default class NewsList extends Component {
                 dataSource={ds.cloneWithRowsAndSections(newsItems)}
                 renderRow={this._renderItem}
                 renderSectionHeader={this._renderSectionHeader}
+                renderFooter={() => {
+                    if(showFooter){
+                        return (
+                            <Footer onPress={this.props.onLoadMore}/>
+                        )
+                    }
+
+                } }
                 refreshControl={
                     <RefreshControl
                         refreshing={this.props.refreshing}

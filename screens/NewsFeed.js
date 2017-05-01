@@ -13,6 +13,8 @@ import NewsList from './NewsList';
 import Router from 'newsfeed/navigation/Router';
 import {formatDate} from 'newsfeed/utilities/date';
 
+const ITEMS_PER_PAGE = 25;
+
 
 
 class NewsFeed extends React.Component {
@@ -21,9 +23,11 @@ class NewsFeed extends React.Component {
         super(props);
         this.state = {
             allPosts: [],
-            refreshing: false
+            refreshing: false,
+            totalPosts: 0
         };
         this._getNewsTitles = this._getNewsTitles.bind(this);
+        this._loadMore = this._loadMore.bind(this);
     }
 
     static route = {
@@ -37,17 +41,18 @@ class NewsFeed extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        const {loading, error, allPosts} = nextProps.data;
+        const {loading, error, allPosts, _allPostsMeta} = nextProps;
         // Only change the rows if some data is comming
         if (!loading && !error) {
             this.setState({
-                allPosts: allPosts
+                allPosts: allPosts,
+                totalPosts: _allPostsMeta.count
             });
         }
     }
 
     render() {
-          const {loading, error} = this.props.data;
+          const {loading, error} = this.props;
           if (error) {
               console.error("Error rendering NewsList:", error);
               return (
@@ -64,7 +69,7 @@ class NewsFeed extends React.Component {
                   </View>
               );
           }
-          const {allPosts} = this.state;
+          const {allPosts, totalPosts} = this.state;
           //console.log("All Posts:", allPosts);
 
           let distinctPostDates = [];
@@ -89,7 +94,7 @@ class NewsFeed extends React.Component {
           console.log("Posts:", posts);
 
           return (
-              <NewsList allPosts={posts} onGoToDetail={this._goToDetail.bind(this)} refreshing={this.state.refreshing} onRefresh={this._getNewsTitles} />
+              <NewsList allPosts={posts} allPostsLength={allPosts.length} totalPosts={totalPosts} onLoadMore={this._loadMore} onGoToDetail={this._goToDetail.bind(this)} refreshing={this.state.refreshing} onRefresh={this._getNewsTitles} />
           )
     }
 
@@ -97,6 +102,10 @@ class NewsFeed extends React.Component {
         this.props.navigation
             .getNavigator('newsFeed')
             .push(Router.getRoute('newsDetail', { newsItem}));
+    }
+
+    _loadMore(){
+        this.props.fetchMore();
     }
 
     _getNewsTitles(){
@@ -115,19 +124,52 @@ class NewsFeed extends React.Component {
             })
         });
     }
+
+
 }
 
 const NewsQuery = gql`
-  query Posts {
-    allPosts(orderBy: createdAt_DESC){
+  query Posts ($skip: Int, $first: Int) {
+    _allPostsMeta{
+      count  
+    }
+    allPosts(skip: $skip, first: $first, orderBy: createdAt_DESC){
       id
       title
       createdAt
     }
   }
-`;
+`
 
-export const NewsFeedWithData = graphql(NewsQuery)(NewsFeed);
+export const NewsFeedWithData = graphql(NewsQuery, {
+    options: (ownProps) => {
+        return {
+            variables: {
+                skip: 0,
+                first: ITEMS_PER_PAGE,
+            },
+            //forceFetch: true
+        }
+    },
+    props: ({ ownProps, data: { loading, allPosts, _allPostsMeta, error, refetch, fetchMore } }) => ({
+        loading,
+        allPosts,
+        _allPostsMeta,
+        error,
+        refetch,
+        fetchMore: () => fetchMore({
+            variables: {
+                skip: allPosts.length,
+            },
+            updateQuery: (prev, { fetchMoreResult }) => {
+                if (!fetchMoreResult) { return prev; }
+                return Object.assign({}, prev, {
+                    allPosts: [...prev.allPosts, ...fetchMoreResult.allPosts],
+                });
+            },
+        }),
+    })
+})(NewsFeed)
 
 const styles = StyleSheet.create({
     container: {
