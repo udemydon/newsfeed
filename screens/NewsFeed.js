@@ -113,7 +113,7 @@ class NewsFeed extends React.Component {
         this.setState({
             refreshing: true
         })
-        this.props.data.refetch().then((res)=> {
+        this.props.refetch().then((res)=> {
             self.setState({
                 allPosts: res.data.allPosts,
                 refreshing: false
