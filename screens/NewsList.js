@@ -3,12 +3,14 @@ import {
     ListView,
     Text,
     View,
-    RefreshControl
+    RefreshControl,
+    StyleSheet
 } from 'react-native';
 import NewsListItem from './NewsListItem';
 
 const ds = new ListView.DataSource({
-    rowHasChanged: (r1, r2) => r1.id !== r2.id
+    rowHasChanged: (r1, r2) => r1.id !== r2.id,
+    sectionHeaderHasChanged: (s1, s2) => s1 !== s2
 });
 
 
@@ -18,6 +20,7 @@ export default class NewsList extends Component {
         super(props);
         this._renderItem = this._renderItem.bind(this);
         this._onRefresh = this._onRefresh.bind(this);
+        this._renderSectionHeader = this._renderSectionHeader.bind(this);
     }
 
     render() {
@@ -27,8 +30,9 @@ export default class NewsList extends Component {
             <ListView
                 enableEmptySections
                 renderSeparator={this._renderSeparator}
-                dataSource={ds.cloneWithRows(newsItems)}
+                dataSource={ds.cloneWithRowsAndSections(newsItems)}
                 renderRow={this._renderItem}
+                renderSectionHeader={this._renderSectionHeader}
                 refreshControl={
                     <RefreshControl
                         refreshing={this.props.refreshing}
@@ -43,6 +47,14 @@ export default class NewsList extends Component {
         return <NewsListItem newsItem={newsItem} onPress={this.props.onGoToDetail.bind(this, newsItem)}/>
     }
 
+    _renderSectionHeader(sectionData, category) {
+        return (
+            <View style={styles.section}>
+                <Text>{category}</Text>
+            </View>
+        )
+    }
+
     _renderSeparator(sectionID, rowID) {
         return <View
             key={`${rowID}`}
@@ -55,5 +67,15 @@ export default class NewsList extends Component {
     }
 
 }
+
+const styles = StyleSheet.create({
+    section : {
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#F0F0F0',
+        height: 30
+    },
+});
+
 
 

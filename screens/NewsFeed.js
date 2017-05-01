@@ -11,6 +11,7 @@ import gql from 'graphql-tag';
 import Colors from '../constants/Colors';
 import NewsList from './NewsList';
 import Router from 'newsfeed/navigation/Router';
+import {formatDate} from 'newsfeed/utilities/date';
 
 
 
@@ -64,9 +65,31 @@ class NewsFeed extends React.Component {
               );
           }
           const {allPosts} = this.state;
-          console.log("posts:", allPosts);
+          //console.log("All Posts:", allPosts);
+
+          let distinctPostDates = [];
+          let postDate;
+          for (let i=0;i<allPosts.length; i++)
+          {
+                postDate = formatDate(allPosts[i].createdAt);
+                let exists = (distinctPostDates.indexOf(postDate) !=  -1);
+                if(!exists){
+                    distinctPostDates.push(postDate);
+                }
+
+           }
+
+          const posts = {};
+          for(let i of distinctPostDates){
+                posts[i] = allPosts.filter((post) => {
+                    return i==formatDate(post.createdAt);
+                });
+          }
+
+          console.log("Posts:", posts);
+
           return (
-              <NewsList allPosts={allPosts} onGoToDetail={this._goToDetail.bind(this)} refreshing={this.state.refreshing} onRefresh={this._getNewsTitles} />
+              <NewsList allPosts={posts} onGoToDetail={this._goToDetail.bind(this)} refreshing={this.state.refreshing} onRefresh={this._getNewsTitles} />
           )
     }
 
@@ -99,6 +122,7 @@ const NewsQuery = gql`
     allPosts(orderBy: createdAt_DESC){
       id
       title
+      createdAt
     }
   }
 `;
