@@ -16,6 +16,7 @@ export default class NewsListItem extends React.Component {
     return (
       <TouchableOpacity
         style={styles.container}
+        onPress={() => this.props.onPress(this.props.newsItem)}
       >
         <View style={{flexDirection: 'row'}}>
           <View style={styles.text}>

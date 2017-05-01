@@ -4,6 +4,7 @@ import HomeScreen from '../screens/HomeScreen';
 import LinksScreen from '../screens/LinksScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import {NewsFeedWithData} from '../screens/NewsFeed';
+import NewsDetail from '../screens/NewsDetail';
 import RootNavigation from './RootNavigation';
 
 export default createRouter(() => ({
@@ -11,5 +12,6 @@ export default createRouter(() => ({
   links: () => LinksScreen,
   settings: () => SettingsScreen,
   rootNavigation: () => RootNavigation,
-  newsFeed: () => NewsFeedWithData
+  newsFeed: () => NewsFeedWithData,
+  newsDetail: () => NewsDetail
 }));

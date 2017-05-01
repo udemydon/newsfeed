@@ -32,7 +32,7 @@ export default class NewsList extends Component {
     }
 
     _renderItem(newsItem) {
-        return <NewsListItem newsItem={newsItem} />
+        return <NewsListItem newsItem={newsItem} onPress={this.props.onGoToDetail.bind(this, newsItem)}/>
     }
 
     _renderSeparator(sectionID, rowID) {

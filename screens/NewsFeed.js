@@ -10,6 +10,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 import Colors from '../constants/Colors';
 import NewsList from './NewsList';
+import Router from 'newsfeed/navigation/Router';
 
 
 
@@ -63,8 +64,14 @@ class NewsFeed extends React.Component {
           const {allPosts} = this.state;
           console.log("posts:", allPosts);
           return (
-              <NewsList allPosts={allPosts}/>
+              <NewsList allPosts={allPosts} onGoToDetail={this._goToDetail.bind(this)}/>
           )
+    }
+
+    _goToDetail(newsItem){
+        this.props.navigation
+            .getNavigator('newsFeed')
+            .push(Router.getRoute('newsDetail', { newsItem}));
     }
 }
 

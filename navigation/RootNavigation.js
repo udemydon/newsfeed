@@ -29,7 +29,7 @@ export default class RootNavigation extends React.Component {
           id="home"
           title="News"
           renderIcon={isSelected => this._renderIcon('newspaper-o', isSelected)}>
-          <StackNavigation initialRoute="newsFeed" />
+          <StackNavigation id="newsFeed" initialRoute="newsFeed" />
         </TabNavigationItem>
 
         <TabNavigationItem
