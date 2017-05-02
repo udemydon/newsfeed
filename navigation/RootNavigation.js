@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, AsyncStorage } from 'react-native';
 import { Notifications } from 'expo';
 import {
   StackNavigation,
@@ -13,10 +13,33 @@ import Colors from '../constants/Colors';
 import registerForPushNotificationsAsync
   from '../api/registerForPushNotificationsAsync';
 
+import CreatePushTokenWithMutation from 'newsfeed/utilities/CreatePushToken';  
+
 export default class RootNavigation extends React.Component {
-  componentDidMount() {
-    this._notificationSubscription = this._registerForPushNotifications();
+
+  constructor(props){
+    super(props);
+    this.state = {
+        registerPushToken : false
+    }
   }
+
+  componentWillMount() {
+    this._notificationSubscription = Notifications.addListener(this._handleNotification.bind(this));
+    AsyncStorage.getItem("GST_PUSH_TOKEN").
+        then((value)=> {
+          //console.log("Push Token:", value);
+          if(!value){
+            this.setState({
+              registerPushToken: true
+            })
+          }
+          else{
+            console.log("Push Token found in AsyncStorage, NEED NOT create push token");
+          }
+    })
+  }
+
 
   componentWillUnmount() {
     this._notificationSubscription && this._notificationSubscription.remove();
@@ -24,26 +47,31 @@ export default class RootNavigation extends React.Component {
 
   render() {
     return (
-      <TabNavigation tabBarHeight={56} initialTab="home">
-        <TabNavigationItem
-          id="home"
-          title="News"
-          renderIcon={isSelected => this._renderIcon('newspaper-o', isSelected)}>
-          <StackNavigation id="newsFeed" initialRoute="newsFeed" />
-        </TabNavigationItem>
+      <View style={styles.container}>
+            {
+              this.state.registerPushToken?  <CreatePushTokenWithMutation handleNotification={this._handleNotification.bind(this)}/>: <View></View>
+            }
+              <TabNavigation tabBarHeight={56} initialTab="home">
+                <TabNavigationItem
+                  id="home"
+                  title="News"
+                  renderIcon={isSelected => this._renderIcon('newspaper-o', isSelected)}>
+                  <StackNavigation id="newsFeed" initialRoute="newsFeed" />
+                </TabNavigationItem>
 
-        <TabNavigationItem
-          id="links"
-          renderIcon={isSelected => this._renderIcon('book', isSelected)}>
-          <StackNavigation initialRoute="links" />
-        </TabNavigationItem>
+                <TabNavigationItem
+                  id="links"
+                  renderIcon={isSelected => this._renderIcon('book', isSelected)}>
+                  <StackNavigation initialRoute="links" />
+                </TabNavigationItem>
 
-        <TabNavigationItem
-          id="settings"
-          renderIcon={isSelected => this._renderIcon('cog', isSelected)}>
-          <StackNavigation initialRoute="settings" />
-        </TabNavigationItem>
-      </TabNavigation>
+                <TabNavigationItem
+                  id="settings"
+                  renderIcon={isSelected => this._renderIcon('cog', isSelected)}>
+                  <StackNavigation initialRoute="settings" />
+                </TabNavigationItem>
+              </TabNavigation>
+       </View>
     );
   }
 
@@ -57,24 +85,8 @@ export default class RootNavigation extends React.Component {
     );
   }
 
-  _registerForPushNotifications() {
-    // Send our push token over to our backend so we can receive notifications
-    // You can comment the following line out if you want to stop receiving
-    // a notification every time you open the app. Check out the source
-    // for this function in api/registerForPushNotificationsAsync.js
-    registerForPushNotificationsAsync();
-
-    // Watch for incoming notifications
-    this._notificationSubscription = Notifications.addListener(
-      this._handleNotification
-    );
-  }
-
   _handleNotification = ({ origin, data }) => {
-    /*this.props.navigator.showLocalAlert(
-      `Push notification ${origin} with data: ${JSON.stringify(data)}`,
-      Alerts.notice
-    );*/
+        
   };
 }
 
