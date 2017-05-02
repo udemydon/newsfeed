@@ -15,6 +15,8 @@ import registerForPushNotificationsAsync
 
 import CreatePushTokenWithMutation from 'newsfeed/utilities/CreatePushToken';  
 
+import Router from 'newsfeed/navigation/Router';
+
 export default class RootNavigation extends React.Component {
 
   constructor(props){
@@ -86,7 +88,20 @@ export default class RootNavigation extends React.Component {
   }
 
   _handleNotification = ({ origin, data }) => {
-        
+        if(data.type == "POST"){
+            if(origin === "received"){
+                //App is in foreground
+                this.props.navigator.showLocalAlert(
+                    data.title,
+                    Alerts.notice
+                );
+            }
+            else{
+                this.props.navigation
+                    .getNavigator('root')
+                    .push(Router.getRoute('newsDetail',{newsItem: { id: data.id, title: data.title }}));
+            }
+    }
   };
 }
 
